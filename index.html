@@ -1,0 +1,150 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>코인 배분 — 아, 클리오다! 런칭 워룸</title>
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<style>
+:root{--mag:#B2418D;--pur:#69388D;--ind:#5263BA;--cyan:#61CAFF;--slate:#3A4850;--mute:#7A8790;--f1:#FAF0F7;--f2:#E5F6FF;--f3:#F0F3F4;--line:#D5DCE0;--red:#C0392B}
+*{box-sizing:border-box;margin:0;padding:0}body{font-family:Pretendard,-apple-system,sans-serif;color:var(--slate);background:#fff;font-weight:400;line-height:1.4}
+header{position:sticky;top:0;background:#fff;border-bottom:1px solid var(--line);padding:12px 16px;z-index:5}
+h1{font-size:17px;color:var(--pur);font-weight:700}.sub{font-size:12px;color:var(--mute);margin-top:2px}
+.bar{display:flex;gap:8px;align-items:center;margin-top:10px;flex-wrap:wrap}
+select,button,input{font:inherit}select,input[type=text]{padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:#fff}
+input[type=text]{min-width:0;flex:1}
+.seg{display:inline-flex;border:1px solid var(--ind);border-radius:999px;overflow:hidden}.seg button{border:0;background:#fff;color:var(--ind);padding:7px 14px;font-weight:600}.seg button.on{background:var(--ind);color:#fff}
+.tot{margin-left:auto;font-weight:700;font-size:15px;padding:6px 14px;border-radius:999px;border:1.5px solid var(--mag);color:var(--mag)}
+.tot.ok{background:var(--mag);color:#fff}.tot.over{border-color:var(--red);color:var(--red)}
+.pill{font-size:11px;padding:3px 9px;border-radius:999px;background:var(--f3);color:var(--mute)}.pill.on{background:var(--f2);color:var(--ind);font-weight:600}
+main{padding:12px 16px 120px;max-width:720px;margin:0 auto}
+.cat{margin-top:16px;font-size:13px;font-weight:700;color:var(--pur);letter-spacing:.04em;display:flex;align-items:center;gap:8px}.cat:after{content:"";flex:1;height:1px;background:var(--f1)}
+.cat .sum{font-weight:600;color:var(--mute);font-size:12px}
+.row{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;padding:9px 0;border-bottom:1px solid #EEF1F3}
+.row .n{font-weight:600;font-size:14px}.row .n small{display:block;font-weight:400;color:var(--mute);font-size:11.5px;margin-top:1px}
+.ctl{display:flex;align-items:center;gap:6px}.ctl button{width:36px;height:36px;border-radius:50%;border:1px solid var(--ind);background:#fff;color:var(--ind);font-size:20px;line-height:1}
+.ctl button:disabled{opacity:.3}.ctl .v{min-width:30px;text-align:center;font-weight:700;font-size:16px}
+.ctl .v.z{color:#B8C2C8;font-weight:500}.dots{display:flex;gap:3px;margin-top:4px}.dots i{width:9px;height:9px;border-radius:2px;border:1px solid var(--ind)}.dots i.f{background:var(--ind)}
+footer{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--line);padding:10px 16px;display:flex;gap:8px;align-items:center}
+footer button{flex:1;padding:13px;border-radius:12px;border:0;font-weight:700;font-size:15px}
+#submit{background:var(--pur);color:#fff}#submit:disabled{background:#CDD3D8}#reset{flex:0 0 auto;background:var(--f3);color:var(--slate);padding:13px 16px}
+.msg{font-size:12.5px;color:var(--mute);padding:8px 0}.warn{color:var(--red);font-weight:600}
+dialog{border:0;border-radius:16px;padding:20px;max-width:420px;width:92vw;font-size:14px}dialog::backdrop{background:rgba(58,72,80,.45)}
+dialog h2{color:var(--pur);font-size:16px;margin-bottom:8px}dialog pre{white-space:pre-wrap;background:var(--f3);padding:10px;border-radius:8px;font:12px/1.5 Pretendard,monospace;max-height:40vh;overflow:auto}
+dialog button{margin-top:12px;padding:10px 16px;border-radius:10px;border:0;background:var(--ind);color:#fff;font-weight:700}
+.admin{display:none}body.admin .admin{display:block}body.admin .team{display:none}
+.abtn{padding:7px 12px;border-radius:999px;border:1px solid var(--ind);background:#fff;color:var(--ind);font-weight:600}
+.bars{display:grid;gap:12px;margin-top:12px}.bars .t{font-size:13px;font-weight:600}.stk{display:flex;height:22px;border-radius:6px;overflow:hidden;background:var(--f3)}.stk span{display:block;height:100%}
+.chk{font-size:12px;color:var(--mute);margin-top:4px}
+.leg{display:flex;flex-wrap:wrap;gap:8px;font-size:12px;margin-top:8px}.leg i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:4px;vertical-align:middle}
+table.log{width:100%;border-collapse:collapse;font-size:12px;margin-top:14px}.log th{text-align:left;color:var(--mute);font-weight:500;border-bottom:1px solid var(--pur);padding:5px 4px}.log td{border-bottom:1px solid #EEF1F3;padding:6px 4px;vertical-align:top}
+.log td.a{font-size:11px;color:var(--mute)}
+</style></head><body>
+<header><h1>코인 배분 <span style="font-weight:400;color:var(--mute);font-size:13px">아, 클리오다! 런칭 워룸</span></h1>
+<div class="sub">네모 하나 = 코인 5개 · 한 항목 최대 25 · 합계 100 · 2차는 1차에서 최대 20개까지만 옮길 수 있습니다</div>
+<div class="bar team"><select id="team"></select><input type="text" id="brand" placeholder="브랜드 이름(선택)" maxlength="30">
+<div class="seg"><button data-r="1" class="on">1차</button><button data-r="2">2차 (돌발 뒤)</button></div>
+<div class="tot" id="tot">0 / 100</div></div>
+<div class="bar team"><span class="pill" id="svr">기록 서버 확인 중…</span></div>
+<div class="bar admin"><b style="color:var(--pur)">진행자 보기</b><button id="refresh" class="abtn">새로고침</button><button id="csv" class="abtn">CSV 내려받기</button>
+<div class="seg"><button data-ar="1" class="on">1차</button><button data-ar="2">2차</button></div><span class="pill" id="svr2"></span></div>
+</header>
+<main>
+<div class="team" id="list"></div>
+<div class="team msg" id="moveMsg"></div>
+<div class="admin"><div class="msg" id="adminMsg"></div><div class="bars" id="bars"></div><div class="leg" id="leg"></div><div id="log"></div></div>
+</main>
+<footer class="team"><button id="reset">초기화</button><button id="submit" disabled>제출</button></footer>
+<dialog id="dlg"><h2 id="dlgT"></h2><div id="dlgB"></div><button onclick="dlg.close()">닫기</button></dialog>
+<script>
+/* 기록 서버(Apps Script 웹앱) 주소를 정하는 순서:
+   ① 주소 끝 ?api=https://script.google.com/macros/s/.../exec (한 번 열면 이 기기에 저장)
+   ② 같은 폴더의 config.json 의 "endpoint"
+   ③ 아래 ENDPOINT 상수
+   셋 다 비어 있으면 이 기기 안에서만 돌고, 제출은 요약 텍스트로 보여 줍니다. */
+const ENDPOINT = "";
+const CATS = [{"code": "A", "name": "고객·시장 이해", "items": [{"code": "A1", "name": "현지 소비자 조사", "desc": "설문·인터뷰·트렌드 파악"}, {"code": "A2", "name": "제품 사용 테스트", "desc": "타깃 고객 체험단과 피드백 수집"}]}, {"code": "B", "name": "제품 개발", "items": [{"code": "B1", "name": "처방·성분 연구", "desc": "효능·안전·현지 기후 적합성"}, {"code": "B2", "name": "제형·사용감", "desc": "텍스처·지속력·발림"}, {"code": "B3", "name": "컬러·셰이드 범위", "desc": "피부톤과 취향의 폭"}, {"code": "B4", "name": "패키지·용기 디자인", "desc": "외형·휴대성·리필"}, {"code": "B5", "name": "안전성·임상 테스트", "desc": "피부 자극·효능 입증 자료"}]}, {"code": "C", "name": "인증·규제 대응", "items": [{"code": "C1", "name": "현지 등록·허가", "desc": "제품 등록·책임자 지정"}, {"code": "C2", "name": "인증 획득", "desc": "할랄·비건·유기농 등"}, {"code": "C3", "name": "라벨·다국어 표기", "desc": "성분표·사용법·법정 표기"}]}, {"code": "D", "name": "가격·생산", "items": [{"code": "D1", "name": "초기 생산 물량", "desc": "첫 재고 확보"}, {"code": "D2", "name": "원가 절감", "desc": "공정·소재·공급처 개선"}, {"code": "D3", "name": "샘플·미니 사이즈", "desc": "체험용·입문용 소용량"}]}, {"code": "E", "name": "유통·채널", "items": [{"code": "E1", "name": "오프라인 리테일 입점", "desc": "드럭스토어·백화점·H&B 매장"}, {"code": "E2", "name": "온라인 마켓플레이스", "desc": "현지 플랫폼·라이브 커머스"}, {"code": "E3", "name": "자사몰·D2C", "desc": "브랜드 몰·멤버십"}, {"code": "E4", "name": "현지 유통 파트너", "desc": "총판·에이전시 계약"}, {"code": "E5", "name": "팝업·체험 공간", "desc": "직접 써 보는 장소"}]}, {"code": "F", "name": "마케팅·커뮤니케이션", "items": [{"code": "F1", "name": "브랜드 네이밍·아이덴티티", "desc": "이름·로고·스토리"}, {"code": "F2", "name": "크리에이터·인플루언서", "desc": "현지 크리에이터 협업"}, {"code": "F3", "name": "숏폼·SNS 광고", "desc": "틱톡·인스타그램 등"}, {"code": "F4", "name": "현지 미디어·PR", "desc": "언론·옥외·방송"}, {"code": "F5", "name": "론칭 이벤트", "desc": "출시 행사·기자간담회"}, {"code": "F6", "name": "샘플링·체험 캠페인", "desc": "증정·체험 유도"}]}, {"code": "G", "name": "운영·고객 관계", "items": [{"code": "G1", "name": "물류·배송", "desc": "통관·창고·배송망"}, {"code": "G2", "name": "현지어 고객 응대·리뷰 관리", "desc": "CS·리뷰 답변·불만 처리"}, {"code": "G3", "name": "데이터 분석·재구매 설계", "desc": "구매 데이터·재구매 유도"}]}];
+const COLORS = ["#B2418D","#69388D","#5263BA","#61CAFF","#8FA3B5","#D4A5C9","#3A4850"];
+let API = "";
+async function resolveApi(){
+  const q = new URLSearchParams(location.search).get('api');
+  if (q) { try { localStorage.setItem('clio_api', q); } catch(e){} }
+  let saved = ''; try { saved = localStorage.getItem('clio_api') || ''; } catch(e){}
+  if (saved) { API = saved; return; }
+  try { const r = await fetch('config.json', {cache:'no-store'}); if (r.ok) { const c = await r.json(); if (c.endpoint) { API = c.endpoint; return; } } } catch(e){}
+  API = ENDPOINT;
+}
+function svrLabel(){ const on = !!API; for (const id of ['svr','svr2']) { const el=document.getElementById(id); el.textContent = on ? '기록 서버 연결됨 · 제출하면 구글 시트에 남습니다' : '기록 서버 없음 · 이 기기에만 저장'; el.className = 'pill' + (on?' on':''); } }
+
+const teamSel=document.getElementById('team'); for(let i=1;i<=6;i++){const o=document.createElement('option');o.value=i;o.textContent='팀 '+i;teamSel.appendChild(o);}
+const brandIn=document.getElementById('brand');
+let round=1, state=load();
+function key(t,r){return 'clio_coins_'+t+'_r'+r}
+function load(){const t=teamSel.value||1;const s={};for(const r of [1,2]){try{s[r]=JSON.parse(localStorage.getItem(key(t,r))||'null')}catch(e){s[r]=null}
+ if(!s[r]){s[r]={};CATS.forEach(c=>c.items.forEach(it=>s[r][it.code]=0));}} try{brandIn.value=localStorage.getItem('clio_brand_'+t)||''}catch(e){} return s;}
+function save(){try{localStorage.setItem(key(teamSel.value,round),JSON.stringify(state[round]));localStorage.setItem('clio_brand_'+teamSel.value,brandIn.value||'')}catch(e){}}
+function total(r){return Object.values(state[r]).reduce((a,b)=>a+b,0)}
+function moved(){let d=0;CATS.forEach(c=>c.items.forEach(it=>d+=Math.abs(state[2][it.code]-state[1][it.code])));return d/2}
+function render(){
+ const list=document.getElementById('list');list.innerHTML='';
+ const cur=state[round];const tot=total(round);
+ CATS.forEach(c=>{const sum=c.items.reduce((a,it)=>a+cur[it.code],0);
+  const h=document.createElement('div');h.className='cat';h.innerHTML=`${c.code} ${c.name}<span class="sum">${sum}</span>`;list.appendChild(h);
+  c.items.forEach(it=>{const v=cur[it.code];const row=document.createElement('div');row.className='row';
+   row.innerHTML=`<div class="n">${it.code} ${it.name}<small>${it.desc}</small><div class="dots">${[0,1,2,3,4].map(i=>`<i class="${v>i*5?'f':''}"></i>`).join('')}</div></div>
+   <div class="ctl"><button data-c="${it.code}" data-d="-5" ${v<=0?'disabled':''} aria-label="5 빼기">−</button><div class="v ${v?'':'z'}">${v}</div><button data-c="${it.code}" data-d="5" ${(v>=25||tot>=100)?'disabled':''} aria-label="5 더하기">＋</button></div>`;
+   list.appendChild(row);});});
+ const T=document.getElementById('tot');T.textContent=tot+' / 100';T.className='tot'+(tot===100?' ok':tot>100?' over':'');
+ const mm=document.getElementById('moveMsg');let ok=tot===100;
+ if(round===2){const m=moved();mm.innerHTML=`1차에서 옮긴 코인: <b>${m}</b> / 20`+(m>20?' <span class="warn">— 20개를 넘었습니다. 일부를 되돌리세요.</span>':'');if(m>20)ok=false;}else mm.textContent='';
+ document.getElementById('submit').disabled=!ok;
+}
+document.getElementById('list').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;const c=b.dataset.c,d=+b.dataset.d;
+ const nv=state[round][c]+d;if(nv<0||nv>25)return;if(d>0&&total(round)+d>100)return;state[round][c]=nv;save();render();});
+document.querySelectorAll('.seg button[data-r]').forEach(b=>b.onclick=()=>{document.querySelectorAll('.seg button[data-r]').forEach(x=>x.classList.remove('on'));b.classList.add('on');round=+b.dataset.r;
+ if(round===2&&total(2)===0){state[2]=Object.assign({},state[1]);save();} render();});
+teamSel.onchange=()=>{state=load();render();};
+brandIn.onchange=save;
+document.getElementById('reset').onclick=()=>{if(!confirm('이 팀의 '+round+'차 배분을 모두 0으로 되돌릴까요?'))return;Object.keys(state[round]).forEach(k=>state[round][k]=0);save();render();};
+function summary(){const t=teamSel.value;const lines=[];CATS.forEach(c=>{const its=c.items.filter(it=>state[round][it.code]>0).map(it=>`${it.code} ${it.name} ${state[round][it.code]}`);if(its.length)lines.push(`[${c.name}] `+its.join(' · '));});
+ return `팀 ${t}${brandIn.value?' · '+brandIn.value:''} · ${round}차 배분 (합계 ${total(round)})\n`+lines.join('\n')+(round===2?`\n이동 코인 ${moved()}`:'');}
+document.getElementById('submit').onclick=async()=>{const dlg=document.getElementById('dlg');const btn=document.getElementById('submit');
+ const payload={team:+teamSel.value,brand:brandIn.value||'',round,alloc:state[round],moved:round===2?moved():0,total:total(round),ts:new Date().toISOString()};
+ if(API){btn.disabled=true;btn.textContent='보내는 중…';
+  try{await fetch(API,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},body:JSON.stringify(payload)});
+   document.getElementById('dlgT').textContent='제출했습니다';document.getElementById('dlgB').innerHTML='<pre>'+summary()+'</pre><p style="margin-top:8px;color:var(--mute)">구글 시트에 기록됐습니다. 고치고 다시 제출해도 됩니다. 마지막 제출이 유효합니다.</p>';}
+  catch(e){document.getElementById('dlgT').textContent='전송 실패';document.getElementById('dlgB').innerHTML='<p>인터넷 연결을 확인하거나 아래 요약을 진행자에게 보여 주세요.</p><pre>'+summary()+'</pre>';}
+  btn.textContent='제출';btn.disabled=false;}
+ else{document.getElementById('dlgT').textContent='배분 요약 (진행자에게 보여 주세요)';document.getElementById('dlgB').innerHTML='<pre>'+summary()+'</pre>';}
+ dlg.showModal();};
+
+/* ── 진행자 보기: 주소 끝에 #admin ── */
+let adminRound=1, lastRows=[], timer=null;
+function setAdmin(){const on=location.hash==='#admin';document.body.classList.toggle('admin',on);if(on){loadAdmin();if(!timer)timer=setInterval(loadAdmin,20000);}else if(timer){clearInterval(timer);timer=null;}}
+window.addEventListener('hashchange',setAdmin);
+document.querySelectorAll('.seg button[data-ar]').forEach(b=>b.onclick=()=>{document.querySelectorAll('.seg button[data-ar]').forEach(x=>x.classList.remove('on'));b.classList.add('on');adminRound=+b.dataset.ar;loadAdmin();});
+document.getElementById('refresh').onclick=loadAdmin;
+document.getElementById('csv').onclick=()=>{const items=CATS.flatMap(c=>c.items.map(it=>it.code));const head=['시각','팀','브랜드','라운드','합계','이동'].concat(items);
+ const lines=[head.join(',')].concat(lastRows.map(r=>[r.ts,r.team,'"'+(r.brand||'').replace(/"/g,'""')+'"',r.round,r.total||'',r.moved||0].concat(items.map(k=>+r.alloc[k]||0)).join(',')));
+ const blob=new Blob(['﻿'+lines.join('\n')],{type:'text/csv;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`coins_round${adminRound}.csv`;a.click();};
+async function loadAdmin(){const box=document.getElementById('bars'),msg=document.getElementById('adminMsg'),log=document.getElementById('log');
+ let rows=[];
+ if(API){try{const r=await fetch(API+'?round='+adminRound+'&_='+Date.now());rows=await r.json();msg.textContent='제출 '+rows.length+'건 · 팀별 마지막 제출을 표시합니다 · 20초마다 새로고침';}catch(e){msg.textContent='불러오기 실패: '+e;}}
+ else{for(let t=1;t<=6;t++){let s=null;try{s=localStorage.getItem(key(t,adminRound))}catch(e){}if(s)rows.push({team:t,round:adminRound,alloc:JSON.parse(s),ts:''});}msg.textContent='기록 서버가 없어 이 기기에 저장된 배분만 보입니다';}
+ lastRows=rows;
+ const last={};rows.forEach(r=>last[r.team]=r);
+ document.getElementById('leg').innerHTML=CATS.map((c,i)=>`<span><i style="background:${COLORS[i]}"></i>${c.code} ${c.name}</span>`).join('');
+ box.innerHTML='';
+ Object.keys(last).sort().forEach(t=>{const r=last[t],a=r.alloc;const sums=CATS.map(c=>c.items.reduce((x,it)=>x+(+a[it.code]||0),0));const tot=sums.reduce((x,y)=>x+y,0)||1;
+  const vals=Object.values(a).map(Number).sort((x,y)=>y-x);const top3=vals.slice(0,3).reduce((x,y)=>x+y,0);
+  const eSum=CATS.find(c=>c.code==='E').items.reduce((x,it)=>x+(+a[it.code]||0),0);
+  const gates=[['C1 현지 등록',+a.C1>0],['유통 채널(E)',eSum>0],['G1 물류',+a.G1>0]].filter(g=>!g[1]).map(g=>g[0]);
+  const used=vals.filter(v=>v>0).length;const top=CATS.flatMap(c=>c.items).sort((x,y)=>(+a[y.code]||0)-(+a[x.code]||0)).slice(0,3).map(it=>`${it.code} ${+a[it.code]||0}`).join(' · ');
+  const d=document.createElement('div');d.innerHTML=`<div class="t">팀 ${t}${r.brand?' · '+r.brand:''} <span style="color:var(--mute);font-weight:400">합계 ${tot}${r.ts?' · '+new Date(r.ts).toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'}):''}</span></div>
+   <div class="stk">${sums.map((s,i)=>`<span style="width:${s/tot*100}%;background:${COLORS[i]}" title="${CATS[i].name} ${s}"></span>`).join('')}</div>
+   <div class="chk">집중 상위3 = <b style="color:${top3>=50?'var(--ind)':'var(--red)'}">${top3}</b> (${top}) · 사용 항목 ${used}/27 · 관문 ${gates.length?'<b style="color:var(--red)">0인 곳: '+gates.join(', ')+'</b>':'<b style="color:var(--ind)">통과</b>'}${adminRound===2&&r.moved!=null?' · 이동 '+r.moved:''}</div>`;box.appendChild(d);});
+ if(!Object.keys(last).length)box.innerHTML='<div class="msg">아직 제출이 없습니다.</div>';
+ // 제출 이력 (최근 것이 위)
+ const hist=rows.slice().reverse().slice(0,60);
+ log.innerHTML=hist.length?`<table class="log"><tr><th>시각</th><th>팀</th><th>브랜드</th><th>합계</th><th>상위 3</th></tr>${hist.map(r=>{const a=r.alloc;const top=CATS.flatMap(c=>c.items).sort((x,y)=>(+a[y.code]||0)-(+a[x.code]||0)).slice(0,3).map(it=>`${it.code} ${+a[it.code]||0}`).join(' · ');
+   return `<tr><td class="a">${r.ts?new Date(r.ts).toLocaleTimeString('ko-KR'):''}</td><td>팀 ${r.team}</td><td>${r.brand||''}</td><td>${r.total||Object.values(a).reduce((x,y)=>x+(+y||0),0)}</td><td class="a">${top}</td></tr>`}).join('')}</table>`:'';
+}
+(async()=>{await resolveApi();svrLabel();render();setAdmin();})();
+</script></body></html>
