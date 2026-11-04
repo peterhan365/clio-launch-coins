@@ -29,7 +29,7 @@ footer button{flex:1;padding:13px;border-radius:12px;border:0;font-weight:700;fo
 dialog{border:0;border-radius:16px;padding:20px;max-width:420px;width:92vw;font-size:14px}dialog::backdrop{background:rgba(58,72,80,.45)}
 dialog h2{color:var(--pur);font-size:16px;margin-bottom:8px}dialog pre{white-space:pre-wrap;background:var(--f3);padding:10px;border-radius:8px;font:12px/1.5 Pretendard,monospace;max-height:40vh;overflow:auto}
 dialog button{margin-top:12px;padding:10px 16px;border-radius:10px;border:0;background:var(--ind);color:#fff;font-weight:700}
-.admin{display:none}body.admin .admin{display:block}body.admin .team{display:none}
+.admin{display:none}body.mode-admin .admin{display:block}body.mode-admin .team{display:none}
 .abtn{padding:7px 12px;border-radius:999px;border:1px solid var(--ind);background:#fff;color:var(--ind);font-weight:600}
 .bars{display:grid;gap:12px;margin-top:12px}.bars .t{font-size:13px;font-weight:600}.stk{display:flex;height:22px;border-radius:6px;overflow:hidden;background:var(--f3)}.stk span{display:block;height:100%}
 .chk{font-size:12px;color:var(--mute);margin-top:4px}
@@ -43,7 +43,7 @@ table.log{width:100%;border-collapse:collapse;font-size:12px;margin-top:14px}.lo
 <div class="seg"><button data-r="1" class="on">1차</button><button data-r="2">2차 (돌발 뒤)</button></div>
 <div class="tot" id="tot">0 / 100</div></div>
 <div class="bar team"><span class="pill" id="svr">기록 서버 확인 중…</span></div>
-<div class="bar admin"><b style="color:var(--pur)">진행자 보기</b><button id="refresh" class="abtn">새로고침</button><button id="csv" class="abtn">CSV 내려받기</button>
+<div class="bar admin"><b style="color:var(--pur)">진행자 보기</b><a href="#" class="abtn" style="text-decoration:none" onclick="location.hash='';return false">참가자 화면</a><button id="refresh" class="abtn">새로고침</button><button id="csv" class="abtn">CSV 내려받기</button>
 <div class="seg"><button data-ar="1" class="on">1차</button><button data-ar="2">2차</button></div><span class="pill" id="svr2"></span></div>
 </header>
 <main>
@@ -52,6 +52,7 @@ table.log{width:100%;border-collapse:collapse;font-size:12px;margin-top:14px}.lo
 <div class="admin"><div class="msg" id="adminMsg"></div><div class="bars" id="bars"></div><div class="leg" id="leg"></div><div id="log"></div></div>
 </main>
 <footer class="team"><button id="reset">초기화</button><button id="submit" disabled>제출</button></footer>
+<div class="team" style="text-align:center;padding:4px 0 90px"><a href="#admin" style="font-size:11px;color:#B8C2C8;text-decoration:none">진행자 화면</a></div>
 <dialog id="dlg"><h2 id="dlgT"></h2><div id="dlgB"></div><button onclick="dlg.close()">닫기</button></dialog>
 <script>
 /* 기록 서버(Apps Script 웹앱) 주소를 정하는 순서:
@@ -117,7 +118,8 @@ document.getElementById('submit').onclick=async()=>{const dlg=document.getElemen
 
 /* ── 진행자 보기: 주소 끝에 #admin ── */
 let adminRound=1, lastRows=[], timer=null;
-function setAdmin(){const on=location.hash==='#admin';document.body.classList.toggle('admin',on);if(on){loadAdmin();if(!timer)timer=setInterval(loadAdmin,20000);}else if(timer){clearInterval(timer);timer=null;}}
+function isAdmin(){return location.hash==='#admin'||new URLSearchParams(location.search).get('view')==='admin'}
+function setAdmin(){const on=isAdmin();document.body.classList.toggle('mode-admin',on);if(on){document.getElementById('adminMsg').textContent='구글 시트에서 불러오는 중…';loadAdmin();if(!timer)timer=setInterval(loadAdmin,20000);}else if(timer){clearInterval(timer);timer=null;}}
 window.addEventListener('hashchange',setAdmin);
 document.querySelectorAll('.seg button[data-ar]').forEach(b=>b.onclick=()=>{document.querySelectorAll('.seg button[data-ar]').forEach(x=>x.classList.remove('on'));b.classList.add('on');adminRound=+b.dataset.ar;loadAdmin();});
 document.getElementById('refresh').onclick=loadAdmin;
@@ -126,7 +128,7 @@ document.getElementById('csv').onclick=()=>{const items=CATS.flatMap(c=>c.items.
  const blob=new Blob(['﻿'+lines.join('\n')],{type:'text/csv;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`coins_round${adminRound}.csv`;a.click();};
 async function loadAdmin(){const box=document.getElementById('bars'),msg=document.getElementById('adminMsg'),log=document.getElementById('log');
  let rows=[];
- if(API){try{const r=await fetch(API+'?round='+adminRound+'&_='+Date.now());rows=await r.json();msg.textContent='제출 '+rows.length+'건 · 팀별 마지막 제출을 표시합니다 · 20초마다 새로고침';}catch(e){msg.textContent='불러오기 실패: '+e;}}
+ if(API){try{const ctl=new AbortController();const tm=setTimeout(()=>ctl.abort(),20000);const r=await fetch(API+'?round='+adminRound+'&_='+Date.now(),{signal:ctl.signal});clearTimeout(tm);rows=await r.json();msg.textContent='제출 '+rows.length+'건 · 팀별 마지막 제출을 표시합니다 · 20초마다 새로고침';}catch(e){msg.innerHTML='<span class="warn">불러오기 실패</span> — 인터넷 또는 script.google.com 접속을 확인하고 새로고침을 누르세요. ('+(e.name||e)+')';}}
  else{for(let t=1;t<=6;t++){let s=null;try{s=localStorage.getItem(key(t,adminRound))}catch(e){}if(s)rows.push({team:t,round:adminRound,alloc:JSON.parse(s),ts:''});}msg.textContent='기록 서버가 없어 이 기기에 저장된 배분만 보입니다';}
  lastRows=rows;
  const last={};rows.forEach(r=>last[r.team]=r);
