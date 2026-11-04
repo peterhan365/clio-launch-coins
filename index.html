@@ -37,10 +37,11 @@ dialog button{margin-top:12px;padding:10px 16px;border-radius:10px;border:0;back
 table.log{width:100%;border-collapse:collapse;font-size:12px;margin-top:14px}.log th{text-align:left;color:var(--mute);font-weight:500;border-bottom:1px solid var(--pur);padding:5px 4px}.log td{border-bottom:1px solid #EEF1F3;padding:6px 4px;vertical-align:top}
 .log td.a{font-size:11px;color:var(--mute)}
 </style></head><body>
-<header><h1>코인 배분 <span style="font-weight:400;color:var(--mute);font-size:13px">아, 클리오다! 런칭 워룸</span></h1>
-<div class="sub">네모 하나 = 코인 5개 · 한 항목 최대 25 · 합계 100 · 2차(돌발변수 뒤)는 1차 값에서 자유롭게 다시 배분합니다</div>
+<header><h1>아, 클리오다! 런칭 워룸</h1>
+<div style="font-size:14px;font-weight:600;color:var(--slate);margin-top:2px">코인 배분</div>
+<div class="sub">네모 하나 = 코인 5개 · 한 항목 최대 25 · 합계 100</div>
 <div class="bar team"><select id="team"></select><input type="text" id="brand" placeholder="브랜드 이름(선택)" maxlength="30">
-<div class="seg"><button data-r="1" class="on">1차</button><button data-r="2">2차 (돌발 뒤)</button></div>
+<div class="seg"><button data-r="1" class="on">1차</button><button data-r="2">2차</button></div>
 <div class="tot" id="tot">0 / 100</div></div>
 <div class="bar team"><span class="pill" id="svr">기록 서버 확인 중…</span></div>
 <div class="bar admin"><b style="color:var(--pur)">진행자 보기</b><a href="#" class="abtn" style="text-decoration:none" onclick="location.hash='';return false">참가자 화면</a><button id="refresh" class="abtn">새로고침</button><button id="csv" class="abtn">CSV 내려받기</button>
@@ -72,7 +73,7 @@ async function resolveApi(){
   try { const r = await fetch('config.json', {cache:'no-store'}); if (r.ok) { const c = await r.json(); if (c.endpoint) { API = c.endpoint; return; } } } catch(e){}
   API = ENDPOINT;
 }
-function svrLabel(){ const on = !!API; for (const id of ['svr','svr2']) { const el=document.getElementById(id); el.textContent = on ? '기록 서버 연결됨 · 제출하면 구글 시트에 남습니다' : '기록 서버 없음 · 이 기기에만 저장'; el.className = 'pill' + (on?' on':''); } }
+function svrLabel(){ const on = !!API; for (const id of ['svr','svr2']) { const el=document.getElementById(id); el.textContent = on ? '제출하면 진행자의 구글 시트에 남습니다' : '기록 서버 없음 · 이 기기에만 저장됩니다'; el.className = 'pill' + (on?' on':''); } }
 
 const teamSel=document.getElementById('team'); for(let i=1;i<=6;i++){const o=document.createElement('option');o.value=i;o.textContent='팀 '+i;teamSel.appendChild(o);}
 const brandIn=document.getElementById('brand');
