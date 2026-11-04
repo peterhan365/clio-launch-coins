@@ -30,7 +30,8 @@ dialog{border:0;border-radius:16px;padding:20px;max-width:420px;width:92vw;font-
 dialog h2{color:var(--pur);font-size:16px;margin-bottom:8px}dialog pre{white-space:pre-wrap;background:var(--f3);padding:10px;border-radius:8px;font:12px/1.5 Pretendard,monospace;max-height:40vh;overflow:auto}
 dialog button{margin-top:12px;padding:10px 16px;border-radius:10px;border:0;background:var(--ind);color:#fff;font-weight:700}
 .admin{display:none}body.mode-admin .admin{display:block}body.mode-admin .team{display:none}
-.abtn{padding:7px 12px;border-radius:999px;border:1px solid var(--ind);background:#fff;color:var(--ind);font-weight:600}
+.abtn{padding:7px 12px;border-radius:999px;border:1px solid var(--ind);background:#fff;color:var(--ind);font-weight:600}.abtn.danger{border-color:var(--red);color:var(--red)}.abtn.danger:disabled{opacity:.5}
+.trow{display:flex;align-items:center;gap:8px}.trow .t{flex:1}.rbtn{flex:none;width:30px;height:30px;border-radius:50%;border:1px solid var(--red);background:#fff;color:var(--red);font-size:15px;line-height:1}
 .bars{display:grid;gap:12px;margin-top:12px}.bars .t{font-size:13px;font-weight:600}.stk{display:flex;height:22px;border-radius:6px;overflow:hidden;background:var(--f3)}.stk span{display:block;height:100%}
 .chk{font-size:12px;color:var(--mute);margin-top:4px}
 .leg{display:flex;flex-wrap:wrap;gap:8px;font-size:12px;margin-top:8px}.leg i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:4px;vertical-align:middle}
@@ -44,7 +45,7 @@ table.log{width:100%;border-collapse:collapse;font-size:12px;margin-top:14px}.lo
 <div class="seg"><button data-r="1" class="on">1차</button><button data-r="2">2차</button></div>
 <div class="tot" id="tot">0 / 100</div></div>
 <div class="bar team"><span class="pill" id="svr">기록 서버 확인 중…</span></div>
-<div class="bar admin"><b style="color:var(--pur)">진행자 보기</b><a href="#" class="abtn" style="text-decoration:none" onclick="location.hash='';return false">참가자 화면</a><button id="refresh" class="abtn">새로고침</button><button id="csv" class="abtn">CSV 내려받기</button>
+<div class="bar admin"><b style="color:var(--pur)">진행자 보기</b><a href="#" class="abtn" style="text-decoration:none" onclick="location.hash='';return false">참가자 화면</a><button id="refresh" class="abtn">새로고침</button><button id="csv" class="abtn">CSV 내려받기</button><button id="resetAll" class="abtn danger">모든 입력값 초기화</button>
 <div class="seg"><button data-ar="1" class="on">1차</button><button data-ar="2">2차</button></div><span class="pill" id="svr2"></span></div>
 </header>
 <main>
@@ -127,10 +128,26 @@ document.getElementById('refresh').onclick=loadAdmin;
 document.getElementById('csv').onclick=()=>{const items=CATS.flatMap(c=>c.items.map(it=>it.code));const head=['시각','팀','브랜드','라운드','합계','이동'].concat(items);
  const lines=[head.join(',')].concat(lastRows.map(r=>[r.ts,r.team,'"'+(r.brand||'').replace(/"/g,'""')+'"',r.round,r.total||'',r.moved||0].concat(items.map(k=>+r.alloc[k]||0)).join(',')));
  const blob=new Blob(['﻿'+lines.join('\n')],{type:'text/csv;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`coins_round${adminRound}.csv`;a.click();};
+/* 초기화 = 시트에 '초기화 표식' 줄을 남기고, 진행자 화면은 표식 이후의 제출만 본다. 시트의 원래 기록은 지워지지 않는다. Apps Script 재배포 불필요. */
+const RESET_TEAM='__RESET__', RESET_ALL='__RESET_ALL__';
+function applyResets(rows){let allIdx=-1;const teamIdx={};
+ rows.forEach((r,i)=>{if(r.brand===RESET_ALL)allIdx=i;else if(r.brand===RESET_TEAM)teamIdx[r.team]=i;});
+ return rows.filter((r,i)=>r.brand!==RESET_ALL&&r.brand!==RESET_TEAM&&i>allIdx&&i>(teamIdx[r.team]??-1));}
+async function postReset(team,marker){const empty={};CATS.forEach(c=>c.items.forEach(it=>empty[it.code]=0));
+ for(const r of [1,2]){await fetch(API,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},body:JSON.stringify({team,brand:marker,round:r,alloc:empty,moved:0,total:0,ts:new Date().toISOString()})});}}
+async function doReset(team){const label=team==null?'모든 팀의 입력값':'팀 '+team+'의 입력값';
+ if(!confirm(label+'을 초기화 하시겠습니까?'))return;
+ if(!API){for(let t=1;t<=6;t++){if(team!=null&&t!==team)continue;for(const r of [1,2]){try{localStorage.removeItem(key(t,r))}catch(e){}}}loadAdmin();return;}
+ const msg=document.getElementById('adminMsg');msg.textContent='초기화 중…';
+ try{await postReset(team==null?0:team,team==null?RESET_ALL:RESET_TEAM);await new Promise(r=>setTimeout(r,1500));}catch(e){msg.innerHTML='<span class="warn">초기화 실패</span> — '+e;return;}
+ loadAdmin();}
+document.getElementById('resetAll').onclick=()=>doReset(null);
+document.getElementById('bars').addEventListener('click',e=>{const b=e.target.closest('button[data-reset]');if(b)doReset(+b.dataset.reset);});
 async function loadAdmin(){const box=document.getElementById('bars'),msg=document.getElementById('adminMsg'),log=document.getElementById('log');
  let rows=[];
  if(API){try{const ctl=new AbortController();const tm=setTimeout(()=>ctl.abort(),20000);const r=await fetch(API+'?round='+adminRound+'&_='+Date.now(),{signal:ctl.signal});clearTimeout(tm);rows=await r.json();msg.textContent='제출 '+rows.length+'건 · 팀별 마지막 제출을 표시합니다 · 20초마다 새로고침';}catch(e){msg.innerHTML='<span class="warn">불러오기 실패</span> — 인터넷 또는 script.google.com 접속을 확인하고 새로고침을 누르세요. ('+(e.name||e)+')';}}
  else{for(let t=1;t<=6;t++){let s=null;try{s=localStorage.getItem(key(t,adminRound))}catch(e){}if(s)rows.push({team:t,round:adminRound,alloc:JSON.parse(s),ts:''});}msg.textContent='기록 서버가 없어 이 기기에 저장된 배분만 보입니다';}
+ rows=applyResets(rows);
  lastRows=rows;
  const last={};rows.forEach(r=>last[r.team]=r);
  document.getElementById('leg').innerHTML=CATS.map((c,i)=>`<span><i style="background:${COLORS[i]}"></i>${c.code} ${c.name}</span>`).join('');
@@ -140,7 +157,7 @@ async function loadAdmin(){const box=document.getElementById('bars'),msg=documen
   const eSum=CATS.find(c=>c.code==='E').items.reduce((x,it)=>x+(+a[it.code]||0),0);
   const gates=[['C1 현지 등록',+a.C1>0],['유통 채널(E)',eSum>0],['G1 물류',+a.G1>0]].filter(g=>!g[1]).map(g=>g[0]);
   const used=vals.filter(v=>v>0).length;const top=CATS.flatMap(c=>c.items).sort((x,y)=>(+a[y.code]||0)-(+a[x.code]||0)).slice(0,3).map(it=>`${it.code} ${+a[it.code]||0}`).join(' · ');
-  const d=document.createElement('div');d.innerHTML=`<div class="t">팀 ${t}${r.brand?' · '+r.brand:''} <span style="color:var(--mute);font-weight:400">합계 ${tot}${r.ts?' · '+new Date(r.ts).toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'}):''}</span></div>
+  const d=document.createElement('div');d.innerHTML=`<div class="trow"><button class="rbtn" data-reset="${t}" title="팀 ${t} 초기화" aria-label="팀 ${t} 초기화">↺</button><div class="t">팀 ${t}${r.brand?' · '+r.brand:''} <span style="color:var(--mute);font-weight:400">합계 ${tot}${r.ts?' · '+new Date(r.ts).toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'}):''}</span></div></div>
    <div class="stk">${sums.map((s,i)=>`<span style="width:${s/tot*100}%;background:${COLORS[i]}" title="${CATS[i].name} ${s}"></span>`).join('')}</div>
    <div class="chk">집중 상위3 = <b style="color:${top3>=50?'var(--ind)':'var(--red)'}">${top3}</b> (${top}) · 사용 항목 ${used}/27 · 관문 ${gates.length?'<b style="color:var(--red)">0인 곳: '+gates.join(', ')+'</b>':'<b style="color:var(--ind)">통과</b>'}${adminRound===2&&r.moved!=null?' · 이동 '+r.moved:''}</div>`;box.appendChild(d);});
  if(!Object.keys(last).length)box.innerHTML='<div class="msg">아직 제출이 없습니다.</div>';
