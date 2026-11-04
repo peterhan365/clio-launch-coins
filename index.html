@@ -38,7 +38,7 @@ table.log{width:100%;border-collapse:collapse;font-size:12px;margin-top:14px}.lo
 .log td.a{font-size:11px;color:var(--mute)}
 </style></head><body>
 <header><h1>코인 배분 <span style="font-weight:400;color:var(--mute);font-size:13px">아, 클리오다! 런칭 워룸</span></h1>
-<div class="sub">네모 하나 = 코인 5개 · 한 항목 최대 25 · 합계 100 · 2차는 1차에서 최대 20개까지만 옮길 수 있습니다</div>
+<div class="sub">네모 하나 = 코인 5개 · 한 항목 최대 25 · 합계 100 · 2차(돌발변수 뒤)는 1차 값에서 자유롭게 다시 배분합니다</div>
 <div class="bar team"><select id="team"></select><input type="text" id="brand" placeholder="브랜드 이름(선택)" maxlength="30">
 <div class="seg"><button data-r="1" class="on">1차</button><button data-r="2">2차 (돌발 뒤)</button></div>
 <div class="tot" id="tot">0 / 100</div></div>
@@ -94,7 +94,7 @@ function render(){
    list.appendChild(row);});});
  const T=document.getElementById('tot');T.textContent=tot+' / 100';T.className='tot'+(tot===100?' ok':tot>100?' over':'');
  const mm=document.getElementById('moveMsg');let ok=tot===100;
- if(round===2){const m=moved();mm.innerHTML=`1차에서 옮긴 코인: <b>${m}</b> / 20`+(m>20?' <span class="warn">— 20개를 넘었습니다. 일부를 되돌리세요.</span>':'');if(m>20)ok=false;}else mm.textContent='';
+ if(round===2){const m=moved();mm.innerHTML=`1차에서 옮긴 코인: <b>${m}</b>개 (참고 수치입니다. 상한은 없습니다)`;}else mm.textContent='';
  document.getElementById('submit').disabled=!ok;
 }
 document.getElementById('list').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;const c=b.dataset.c,d=+b.dataset.d;
